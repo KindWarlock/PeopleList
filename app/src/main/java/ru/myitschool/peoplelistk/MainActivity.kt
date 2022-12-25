@@ -1,30 +1,49 @@
 package ru.myitschool.peoplelistk
 
+import android.content.res.Resources
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.ListView
+import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
+    var people = mutableListOf<String>()
+    lateinit var adapter: ArrayAdapter<String>
+
+    private fun genPeople(peopleNumber: Int) {
+        val firstNames = resources.getStringArray(R.array.first_name)
+        val lastNames = resources.getStringArray(R.array.last_name)
+
+        for (i in 0 until peopleNumber) {
+            val first = firstNames[Random.nextInt(firstNames.size)]
+            val last = lastNames[Random.nextInt(lastNames.size)]
+            people.add("$first $last")
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val lvPeople = findViewById<ListView>(R.id.people)
-        val people = arrayOf("Petya", "Vasya", "Mary") // массив неизменяем
-        // TODO: сгенерировать список персон из случайных сочетаний имён и фамилий
-        // TODO: создайте два string-array в ресурсах и получите список их случайных комбинаций
-        val adapter = ArrayAdapter<String>(this, R.layout.item, people)
+
+        genPeople(6)
+        adapter = ArrayAdapter<String>(this, R.layout.item, people)
         lvPeople.adapter = adapter // задаём адаптер (посредник) для отображения данных на списке
 
-        // пример чтения строк из ресурсов
-        val sampleList = resources.getStringArray(R.array.samplelist) // функция возвращает массив
     }
 
     fun onAddPersonClick(view: View) {
-
-        // TODO: реализовать добавление новых персон в список
-        // имя считывать из текстового поля
-        // если нужно изменять число элементов, используйте MutableList<String>
+        val txtField = findViewById<EditText>(R.id.new_name)
+        val newName = txtField.text.toString()
+        if (newName == "") {
+            return
+        }
+        adapter.add(newName)
+        adapter.notifyDataSetChanged()
+        txtField.setText("")
     }
 }
